@@ -4,7 +4,6 @@ const { Server } = require('socket.io');
 const path = require('path');
 
 const app = express();
-const path = require('path');
 
 app.get('/', (req, res) => {
     // __dirname מבטיח ש-Node יחפש בתיקייה שבה נמצא השרת
