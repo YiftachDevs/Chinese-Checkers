@@ -1,47 +1,56 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
-
-const app = express();
 const path = require('path');
 
-// השורה הזו אומרת לשרת לשלוח את קובץ ה-index.html כשמישהו נכנס לאתר
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
+const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// מצב הלוח התחלתי: מערך של אובייקטים {id, color, x, y}
-let pieces = [];    
+// הגדרת הפורט - Render נותן פורט משתנה, לכן משתמשים ב-process.env.PORT
+const PORT = process.env.PORT || 3000;
+
+// שליחת קובץ ה-HTML כשנכנסים לאתר
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// מצב הלוח (Sandbox)
+let pieces = [];
 let idCounter = 0;
 
-// יצירת הכלים בתחילת המשחק
+// יצירת הכלים (כמו קודם)
 for (let row = 0; row < 8; row++) {
     for (let col = 0; col < 8; col++) {
-        if (row < 3 && col < 3) {
-            pieces.push({ id: idCounter++, color: 'black', row, col });
-        } else if (row >= 8 - 3 && col >= 8 - 3) {
-            pieces.push({ id: idCounter++, color: 'red', row, col });
+        if ((row + col) % 2 !== 0) {
+            if (row < 3) pieces.push({ id: idCounter++, color: 'black', row, col });
+            if (row > 4) pieces.push({ id: idCounter++, color: 'red', row, col });
         }
     }
 }
 
 io.on('connection', (socket) => {
-    // שולח לשחקן החדש את מצב הלוח הנוכחי
+    console.log('Player connected:', socket.id);
+    
+    // שליחת המצב הנוכחי לשחקן שהתחבר
     socket.emit('boardState', pieces);
 
-    // עדכון תזוזה מכל שחקן
+    // סנכרון תזוזות
     socket.on('movePiece', (data) => {
         const piece = pieces.find(p => p.id === data.id);
         if (piece) {
             piece.row = data.row;
             piece.col = data.col;
-            // שליחה לכולם חוץ מהשולח כדי למנוע קפיצות
             socket.broadcast.emit('pieceMoved', data);
         }
     });
+
+    socket.on('disconnect', () => {
+        console.log('Player disconnected');
+    });
 });
 
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`Server on ${PORT}`));
+// הפעלה על הפורט הדינמי
+server.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
