@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Free Checkers Sandbox</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        body { display: flex; justify-content: center; background: #333; font-family: sans-serif; }
+        #board { display: grid; grid-template-columns: repeat(8, 60px); grid-template-rows: repeat(8, 60px); border: 5px solid #555; margin-top: 50px; }
+        .cell { width: 60px; height: 60px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .dark { background-color: #8b4513; }
+        .light { background-color: #f0d9b5; }
+        .piece { width: 45px; height: 45px; border-radius: 50%; border: 2px solid #000; transition: transform 0.2s; }
+        .red { background: #d32f2f; }
+        .black { background: #212121; }
+        .selected { border: 4px solid #4CAF50 !important; }
+    </style>
+</head>
+<body>
+    <div id="board"></div>
+
+    <script>
+        const socket = io(); // ב-Render שים כאן את ה-URL שלך
+        const board = document.getElementById('board');
+        let pieces = [];
+        let selectedPieceId = null;
+
+        // יצירת משבצות הלוח
+        function createBoard() {
+            board.innerHTML = '';
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = `cell ${(r + c) % 2 === 0 ? 'light' : 'dark'}`;
+                    cell.onclick = () => handleCellClick(r, c);
+                    cell.id = `cell-${r}-${c}`;
+                    board.appendChild(cell);
+                }
+            }
+        }
+
+        function drawPieces() {
+            // ניקוי כל הכלים הקיימים
+            document.querySelectorAll('.piece').forEach(p => p.remove());
+            pieces.forEach(p => {
+                const pieceDiv = document.createElement('div');
+                pieceDiv.className = `piece ${p.color} ${selectedPieceId === p.id ? 'selected' : ''}`;
+                pieceDiv.onclick = (e) => {
+                    e.stopPropagation();
+                    selectedPieceId = p.id;
+                    drawPieces();
+                };
+                document.getElementById(`cell-${p.row}-${p.col}`).appendChild(pieceDiv);
+            });
+        }
+
+        function handleCellClick(row, col) {
+            if (selectedPieceId !== null) {
+                const piece = pieces.find(p => p.id === selectedPieceId);
+                piece.row = row;
+                piece.col = col;
+                socket.emit('movePiece', { id: piece.id, row, col });
+                selectedPieceId = null;
+                drawPieces();
+            }
+        }
+
+        socket.on('boardState', (data) => { pieces = data; createBoard(); drawPieces(); });
+        socket.on('pieceMoved', (data) => {
+            const piece = pieces.find(p => p.id === data.id);
+            if (piece) {
+                piece.row = data.row;
+                piece.col = data.col;
+                drawPieces();
+            }
+        });
+    </script>
+</body>
+</html>
