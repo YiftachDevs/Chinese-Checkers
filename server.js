@@ -4,27 +4,23 @@ const { Server } = require('socket.io');
 const path = require('path');
 
 const app = express();
-
-app.get('/', (req, res) => {
-    // __dirname מבטיח ש-Node יחפש בתיקייה שבה נמצא השרת
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
 const server = http.createServer(app);
 const io = new Server(server);
 
-// הגדרת הפורט - Render נותן פורט משתנה, לכן משתמשים ב-process.env.PORT
 const PORT = process.env.PORT || 3000;
 
-// שליחת קובץ ה-HTML כשנכנסים לאתר
+// הגשת קבצים סטטיים מהתיקייה הנוכחית
+app.use(express.static(__dirname));
+
+// ניתוב ראשי לקובץ ה-HTML
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// מצב הלוח (Sandbox)
 let pieces = [];
 let idCounter = 0;
 
-// יצירת הכלים (כמו קודם)
+// יצירת לוח התחלתי
 for (let row = 0; row < 8; row++) {
     for (let col = 0; col < 8; col++) {
         if ((row + col) % 2 !== 0) {
@@ -36,11 +32,8 @@ for (let row = 0; row < 8; row++) {
 
 io.on('connection', (socket) => {
     console.log('Player connected:', socket.id);
-    
-    // שליחת המצב הנוכחי לשחקן שהתחבר
     socket.emit('boardState', pieces);
 
-    // סנכרון תזוזות
     socket.on('movePiece', (data) => {
         const piece = pieces.find(p => p.id === data.id);
         if (piece) {
@@ -55,7 +48,6 @@ io.on('connection', (socket) => {
     });
 });
 
-// הפעלה על הפורט הדינמי
 server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
