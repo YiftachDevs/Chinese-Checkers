@@ -23,9 +23,10 @@ let idCounter = 0;
 // יצירת לוח התחלתי
 for (let row = 0; row < 8; row++) {
     for (let col = 0; col < 8; col++) {
-        if ((row + col) % 2 !== 0) {
-            if (row < 3) pieces.push({ id: idCounter++, color: 'black', row, col });
-            if (row > 4) pieces.push({ id: idCounter++, color: 'red', row, col });
+        if (row < 3 && col < 3) {
+            pieces.push({ id: idCounter++, color: 'black', row, col });
+        } else if (row >= 8 - 3 && col >= 8 - 3) {
+            pieces.push({ id: idCounter++, color: 'red', row, col });
         }
     }
 }
