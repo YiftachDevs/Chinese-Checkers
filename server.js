@@ -18,26 +18,24 @@ app.get('/', (req, res) => {
 });
 
 let pieces = [];
-let idCounter = 0;
 
-// יצירת לוח התחלתי
-for (let row = 0; row < 10; row++) {
-    for (let col = 0; col < 10; col++) {
-        if (col == 0) {
-            pieces.push({ id: idCounter++, color: 'black', row, col });
-            pieces.push({ id: idCounter++, color: 'black', row, col });
-            pieces.push({ id: idCounter++, color: 'black', row, col });
-            pieces.push({ id: idCounter++, color: 'black', row, col });
-            pieces.push({ id: idCounter++, color: 'black', row, col });
-        } else if (col == 9) {
-            pieces.push({ id: idCounter++, color: 'red', row, col });
-            pieces.push({ id: idCounter++, color: 'red', row, col });
-            pieces.push({ id: idCounter++, color: 'red', row, col });
-            pieces.push({ id: idCounter++, color: 'red', row, col });
-            pieces.push({ id: idCounter++, color: 'red', row, col });
+function init() {
+    pieces = [];
+    let idCounter = 0;
+
+    // יצירת לוח התחלתי
+    for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+            if (col < 3 && row < 3) {
+                pieces.push({ id: idCounter++, color: 'black', row, col });
+            } else if (col >= 8 - 3 && row >= 8 - 3) {
+                pieces.push({ id: idCounter++, color: 'red', row, col });
+            }
         }
     }
 }
+
+init()
 
 io.on('connection', (socket) => {
     console.log('Player connected:', socket.id);
@@ -50,6 +48,11 @@ io.on('connection', (socket) => {
             piece.col = data.col;
             socket.broadcast.emit('pieceMoved', data);
         }
+    });
+
+    socket.on('init', (data) => {
+        init()
+        socket.broadcast.emit('init', data);
     });
 
     socket.on('disconnect', () => {

@@ -5,7 +5,7 @@
     <script src="/socket.io/socket.io.js"></script>
     <style>
         body { display: flex; flex-direction: column; align-items: center; background: #222; color: white; font-family: sans-serif; }
-        #board { display: grid; grid-template-columns: repeat(10, 60px); grid-template-rows: repeat(10, 60px); border: 5px solid #444; margin-top: 20px; }
+        #board { display: grid; grid-template-columns: repeat(8, 60px); grid-template-rows: repeat(8, 60px); border: 5px solid #444; margin-top: 20px; }
         .cell { width: 60px; height: 60px; display: flex; justify-content: center; align-items: center; }
         .dark { background-color: #5d3a1a; }
         .light { background-color: #e3c193; }
@@ -16,10 +16,10 @@
     </style>
 </head>
 <body>
-    <h1>4 Be-shura</h1>
-    <p>המצנח זוכה והמפסיד בוכה</p>
+    <h1>Chinese Checkers</h1>
+    <p>"you caught me at a very chinese time in my life"</p>
     <p>מאת אור גד & יפתח רק</p>
-    <button onclick="initBoard()">כפתור מסוכן לא ללחוץ</button>
+    <button>כפתור חסר תועלת, ניתן ללחוץ</button>
     <div id="board"></div>
 
     <script>
@@ -28,10 +28,14 @@
         let pieces = [];
         let selectedPieceId = null;
 
+        function temp() {
+            socket.emit('init');  
+        }
+
         function initBoard() {
             boardElement.innerHTML = '';
-            for (let r = 0; r < 10; r++) {
-                for (let c = 0; c < 10; c++) {
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
                     const cell = document.createElement('div');
                     cell.className = `cell ${(r + c) % 2 === 0 ? 'light' : 'dark'}`;
                     cell.onclick = () => moveSelectedPiece(r, c);
@@ -39,6 +43,7 @@
                     boardElement.appendChild(cell);
                 }
             }
+            let idCounter = 0;
         }
 
         function draw() {
