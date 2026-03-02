@@ -22,12 +22,16 @@ let idCounter = 0;
 
 // יצירת לוח התחלתי
 for (let row = 0; row < 8; row++) {
-    for (let col = 0; col < 8; col++) {
+    for (let col = 0; col < 10; col++) {
         if (col == 0) {
             pieces.push({ id: idCounter++, color: 'black', row, col });
             pieces.push({ id: idCounter++, color: 'black', row, col });
             pieces.push({ id: idCounter++, color: 'black', row, col });
-        } else if (col == 7) {
+            pieces.push({ id: idCounter++, color: 'black', row, col });
+            pieces.push({ id: idCounter++, color: 'black', row, col });
+        } else if (col == 9) {
+            pieces.push({ id: idCounter++, color: 'red', row, col });
+            pieces.push({ id: idCounter++, color: 'red', row, col });
             pieces.push({ id: idCounter++, color: 'red', row, col });
             pieces.push({ id: idCounter++, color: 'red', row, col });
             pieces.push({ id: idCounter++, color: 'red', row, col });
