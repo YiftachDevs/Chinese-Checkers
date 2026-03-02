@@ -21,7 +21,7 @@ let pieces = [];
 let idCounter = 0;
 
 // יצירת לוח התחלתי
-for (let row = 0; row < 8; row++) {
+for (let row = 0; row < 10; row++) {
     for (let col = 0; col < 10; col++) {
         if (col == 0) {
             pieces.push({ id: idCounter++, color: 'black', row, col });
