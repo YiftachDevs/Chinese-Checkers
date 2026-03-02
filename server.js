@@ -21,15 +21,15 @@ let pieces = [];
 let idCounter = 0;
 
 // יצירת לוח התחלתי
-for (let row = 0; row < 10; row++) {
-    for (let col = 0; col < 8; col++) {
-        if (row == 0) {
+for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 10; col++) {
+        if (col == 0) {
             pieces.push({ id: idCounter++, color: 'black', row, col });
             pieces.push({ id: idCounter++, color: 'black', row, col });
             pieces.push({ id: idCounter++, color: 'black', row, col });
             pieces.push({ id: idCounter++, color: 'black', row, col });
             pieces.push({ id: idCounter++, color: 'black', row, col });
-        } else if (row == 9) {
+        } else if (col == 9) {
             pieces.push({ id: idCounter++, color: 'red', row, col });
             pieces.push({ id: idCounter++, color: 'red', row, col });
             pieces.push({ id: idCounter++, color: 'red', row, col });
